@@ -48,7 +48,7 @@ class Obiekty extends Model
      *
      * @var array
      */
-    protected $hidden = ['id'];
+    protected $hidden = [];
 
     /**
      * The attributes that should be mutated to dates.
@@ -133,8 +133,16 @@ class Obiekty extends Model
         return self::ObiektyQuery()->where('status', $status)->get();
     }
 
+    /**
+     * Funkcja wyszukuje w historii
+     *
+     * @param string $status
+     * @return Collection
+     */
     public static function findByHistoryStatus($status)
     {
+        $status = strtoupper($status);
+
         return self::ObiektyQuery(true)->whereHas('historia', function ($subquery) use ($status) {
             $subquery->where('status_name', $status);
             $subquery->orderBy('created_at', 'desc');

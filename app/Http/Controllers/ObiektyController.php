@@ -110,17 +110,18 @@ class ObiektyController extends Controller
         try {
             DB::beginTransaction();
 
+            $obiekt->status = Historia::STATUS_EDYCJA;
+            $obiekt->numer = $request->numer;
+            $obiekt->save();
+
             $historia = new Historia();
             $historia->status_name = Historia::STATUS_EDYCJA;
             $historia->created_at = Carbon::now();
             $historia->obiekt_id = $id;
             $historia->save();
 
-            $obiekt->status = Historia::STATUS_EDYCJA;
-            $obiekt->numer = $request->numer;
-            $obiekt->save();
-
             DB::commit();
+
         } catch(\Exception $ex) {
             DB::rollback();
 
@@ -131,7 +132,7 @@ class ObiektyController extends Controller
         }
 
         return $this->responseJson(
-            $obiekt,
+            Obiekty::query()->whereId($id)->with('historia')->first(),
             Response::HTTP_OK,
             'Edycja rekordu przebiegła pomyślnie'
         );
